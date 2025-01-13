@@ -1,4 +1,4 @@
-## Implementing Linear Regression using Optimizer Module of the PyTorch : 
+## Implementing Linear Regression using Optimizer Module and Linear Model for forward pass from PyTorch : 
 import numpy as np
 import torch
 
@@ -29,18 +29,28 @@ Steps:
 
 ## Initialize Varaibles: 
 
-X = torch.tensor([1, 2, 3, 4], dtype=torch.float32)
-Y = torch.tensor([2, 4, 6, 8], dtype=torch.float32)
+## We need to make it into a 2D Array, where the Rows = Samples, Columns = Features of the Samples
+X = torch.tensor([[1], [2], [3], [4]], dtype=torch.float32)
+Y = torch.tensor([[2], [4], [6], [8]], dtype=torch.float32)
 
-w = torch.tensor(0.0, dtype=torch.float32, requires_grad=True)
-print(f'Val of w {w}')
+n_samples, n_features = X.shape
+
+input_shape = n_features
+output_shape = n_features
+
+model = torch.nn.Linear(input_shape, output_shape)
+
+## Do not need the wwights as the model already has them (nn.Linear)
+# w = torch.tensor(0.0, dtype=torch.float32, requires_grad=True)
+# print(f'Val of w {w}')
 
 ## Loss Functions (Using MSE): 
-def loss(y,y_pred): 
-    l = (y_pred-y)**2
-    return l.mean()
+# def loss(y,y_pred): 
+#     l = (y_pred-y)**2
+#     return l.mean()
 
-# loss = torch.nn.MSELoss()
+
+loss = torch.nn.MSELoss()
 
 ## Gradient Calculation: 
 '''
@@ -55,12 +65,13 @@ def gradient(x, y, y_pred):
     return torch.mean(2*x*(y_pred-y))
 
 # Training Loop
-epoch = 100
+epoch = 1000
 lr = 0.01  # Increased learning rate
-optim = torch.optim.SGD([w],lr)
+
+optim = torch.optim.SGD(model.parameters(),lr)
 
 for i in range(epoch): 
-    prediction = X * w
+    prediction = model(X)
     loss_val = loss(Y,prediction)
     # grad = gradient(X,Y,prediction) ## Gradient will be an array --> Multiple Values. Do we need multiple values? 
     
@@ -89,4 +100,5 @@ for i in range(epoch):
     if (i%2==0):
         print(f'Epoch: {i}, Loss: {loss_val:.3f} \n Prediction: {torch.mean(prediction)}')
 
-print(f'Final Prediction for Torch: {w*X} \n Weight: {w}')
+w,b = model.parameters()
+print(f'Final Prediction for Torch: {prediction} \n Weight: {w.item()}')
