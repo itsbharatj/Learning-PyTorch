@@ -42,7 +42,7 @@ def gradient(x, y, y_pred):
     return np.mean(2*x*(y_pred-y))
 
 # Training Loop
-epoch = 1000
+epoch = 100
 lr = 0.01  # Increased learning rate
 
 
@@ -61,4 +61,4 @@ for i in range(epoch):
     if (i%2==0):
         print(f'Epoch: {i}, Loss: {loss_val:.3f} \n Prediction: {np.mean(prediction)}')
 
-print(f'Final Prediction: {w*X} \n Weight: {w}')
+print(f'Final Prediction for using Numpy: {w*X} \n Weight: {w}')

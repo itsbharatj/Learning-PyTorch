@@ -1,4 +1,4 @@
-## Implementing Linear Regression using NumpPy: 
+## Implementing Linear Regression using Optimizer Module of the PyTorch : 
 import numpy as np
 import torch
 
@@ -14,6 +14,15 @@ Steps:
     - Call eveything
     - Update the weights based on the gradient*learning rate (subtract that from the old weights)
     - Print the loss after every epoch, and the prediction that is given
+    
+    - Calculate the predicted value from w*X 
+    - Then using the optimizer, calculate the gradients
+    - From then use optim.step() --> What does it exactly does? --> Does the complete backpropogation (gradients calculation and weight update) 
+    - Then it updates the weight automatically? 
+
+- We can also: 
+ = Use nn.Linear Layer for the forward propogation 
+ = Not sure about the transformations and data types which PyTorch requires for the optimizer library
 
 - Print the prediction after training
 '''
@@ -48,18 +57,26 @@ def gradient(x, y, y_pred):
 # Training Loop
 epoch = 100
 lr = 0.01  # Increased learning rate
-
+optim = torch.optim.SGD([w],lr)
 
 for i in range(epoch): 
     prediction = X * w
     loss_val = loss(Y,prediction)
     # grad = gradient(X,Y,prediction) ## Gradient will be an array --> Multiple Values. Do we need multiple values? 
-
+    
+    optim.zero_grad()
     loss_val.backward()
 
-    with torch.no_grad(): 
-        w -= lr*w.grad
-        w.grad.zero_()
+    ## How the hell are the optim and the weights connected? 
+    ## --> The loss_val is calculating the gradients wrt to weights, which is then getting used by the optim module for weight update
+    optim.step()
+
+
+
+
+    # with torch.no_grad(): 
+    #     w -= lr*w.grad
+    #     w.grad.zero_()
 
     # print(f'Grad: {grad}')
     ## Update the weights: 
