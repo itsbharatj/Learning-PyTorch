@@ -4,6 +4,7 @@ from sklearn import datasets
 import torch 
 import torch.nn as nn 
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 '''
 Steps: 
@@ -28,13 +29,22 @@ Training Loop:
 
 ## 1) Defining the dataset from Sklearn: 
 
-X,y = datasets.make_regression(n_samples=200, n_features=1)
+X, y = datasets.make_regression(n_samples=200, n_features=1, noise=20, random_state=42)
+
+# Standardize the features and target
+# This ensures our data has mean=0 and std=1, which helps with training stability
+scaler_X = StandardScaler()
+scaler_y = StandardScaler()
+
+X_scaled = scaler_X.fit_transform(X)
+y_scaled = scaler_y.fit_transform(y.reshape(-1, 1)).flatten()
+
 
 # print(f'This is X: {X} \n This is y: {y}')
 ## Convert this to a torch tensor from a NumPy array: 
 
-X_torch = torch.from_numpy(X).to(dtype=torch.float32)
-y_torch = torch.from_numpy(y).to(dtype=torch.float32)
+X_torch = torch.from_numpy(X_scaled).to(dtype=torch.float32)
+y_torch = torch.from_numpy(y_scaled).to(dtype=torch.float32)
 
 # print(type(X_torch), type(y_torch))
 
@@ -83,6 +93,9 @@ for epoch in range(n_epochs):
 
 # Assuming model and X_torch are already defined
 prediction_y = model(X_torch).detach().numpy()
+
+print(prediction_y)
+
 
 # X should be converted to numpy if it's a tensor
 X = X_torch.detach().numpy()
