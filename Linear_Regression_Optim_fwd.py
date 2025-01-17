@@ -82,9 +82,6 @@ for i in range(epoch):
     ## --> The loss_val is calculating the gradients wrt to weights, which is then getting used by the optim module for weight update
     optim.step()
 
-
-
-
     # with torch.no_grad(): 
     #     w -= lr*w.grad
     #     w.grad.zero_()

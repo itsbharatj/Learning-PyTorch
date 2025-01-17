@@ -8,21 +8,6 @@ import matplotlib.pyplot as plt
 
 '''
 
--- What needs to be done in the day: 
-
-- Just complete this program 
-- Watch and understand the 20 minute video on datasets and dataloaders (with notes)
-- Implement what you just watched 
-- Post it on X for now 
-
-- In the weekend, also post on the LinkedIn of the progress that you have made
-- Do not get up  until done please! 
-
-but it will take time and that I do not have for now, how do I solve it? I think whenever I am feeling this way it is usually unfinished tasks that have been 
-taking my mindspace, for most often, I need to make sure that there has been 
-
-Implement Logistic Regression of the BC Dataset
-
 Steps involved: 
 - Dowload the Dataset X and y 
 - Make sure to have the target 
