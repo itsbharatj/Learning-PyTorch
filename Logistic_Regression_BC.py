@@ -4,7 +4,7 @@ import torch.nn as nn
 import sklearn 
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-
+import matplotlib.pyplot as plt
 
 '''
 
@@ -89,6 +89,8 @@ optimizer = torch.optim.SGD(model.parameters(),lr=lr)
 n_epoch = 10000
 X_train_torch = torch.from_numpy(X_train).to(dtype=torch.float32)
 
+loss_ = []
+
 for epoch in range(n_epoch):
     '''
     What happens in the training loop? 
@@ -108,5 +110,14 @@ for epoch in range(n_epoch):
     optimizer.step() 
     optimizer.zero_grad()
 
-    if epoch%100==0: 
-        print(f'Epoch {epoch}, Loss: {loss}')
+    if epoch%10==0: 
+        loss_.append(loss.detach().numpy())
+        # print(f'Epoch {epoch}, Loss: {loss}')
+
+epochs = [i for i in range(n_epoch) if i%10==0]
+
+
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.plot(epochs,loss_)
+plt.show()
