@@ -7,8 +7,6 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 '''
-
-Steps involved: 
 - Dowload the Dataset X and y 
 - Make sure to have the target 
 
