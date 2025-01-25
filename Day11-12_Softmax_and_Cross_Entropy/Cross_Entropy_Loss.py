@@ -27,5 +27,3 @@ loss_bad = loss(y_pred_bad,y)
 
 print(f'Loss Good: {loss_good} \nLoss Bad: {loss_bad}')
 
-
-
