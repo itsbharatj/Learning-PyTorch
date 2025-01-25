@@ -46,11 +46,15 @@ Can use activation functions in two ways:
 
 1. During initilization (torch.nn.a_f)
 
-    Eg. torch.nn.sigmoid()
+    Eg. torch.nn.Sigmoid()
+        torch.nn.ReLU()
+        torch.nn.Softmax()
 
 2. At the forward method (torch.A_F)
 
-    Eg. torch.Sigmoid()
+    Eg. torch.sigmoid()
+        torch.relu()
+        torch.softmax()
 
 - Why are there two ways 
 - Why does the nn methods have to be initialized (or do they) to be used  
@@ -58,3 +62,57 @@ Can use activation functions in two ways:
 Will make a simple NN, with 2 liner layers and one activation funtions. Both the ways 
 '''
 
+import torch 
+import torch.nn as nn 
+
+class Simple_NN_1(nn.Module):
+    def __init__(self,input_size, hidden_size): 
+        super(Simple_NN_1,self).__init__()
+
+        self.linear1 = nn.Linear(input_size,hidden_size)
+        self.relu = nn.ReLU()
+        self.linear2 = nn.Linear(hidden_size,1)
+        self.sigmoid = nn.Sigmoid()
+    
+
+    def forward(self,x): 
+        out = self.linear1(x)
+        out = self.relu(out)
+        out = self.linear2(out)
+        out = self.sigmoid(out)
+
+        return out 
+
+class Simple_NN_2(nn.Module): 
+    def __init__(self,input_size, hidden_size): 
+        super(Simple_NN_2,self).__init__()
+
+        ## We do not need to initilize the activation functions here
+
+        self.linear1 = nn.Linear(input_size,hidden_size)
+        self.linear2 = nn.Linear(hidden_size,1)
+
+    def forward(self,x): 
+
+        out = torch.relu(self.linear1(x))
+        out = torch.sigmoid(self.linear2(out))
+
+        return out 
+    
+
+### Now we need to check if both of them are the same or not? 
+
+input_t = torch.tensor([3.0,2.5,1.2,9.9,123.0],requires_grad=True)
+input_size = input_t.shape[0]
+print(input_size)
+hidden_size = 5
+
+torch.manual_seed(42243)
+nn1 = Simple_NN_1(input_size,hidden_size)
+torch.manual_seed(42243)
+nn2 = Simple_NN_2(input_size,hidden_size)
+
+out_1 = nn1(input_t)
+out_2 = nn2(input_t)
+
+print(f'Output 1: {out_1}, Output 2: {out_2}')
