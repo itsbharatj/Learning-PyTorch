@@ -51,6 +51,7 @@ if __name__ == "__main__":
     n_epochs = 10
     n_itterations = int(np.ceil(dataset.length/10))
     print(n_itterations)
+    
 
     ## This is working as well
     for i in range(n_epochs): 

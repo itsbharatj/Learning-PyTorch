@@ -115,4 +115,4 @@ nn2 = Simple_NN_2(input_size,hidden_size)
 out_1 = nn1(input_t)
 out_2 = nn2(input_t)
 
-print(f'Output 1: {out_1}, Output 2: {out_2}')
+print(f'Output 1: {out_1}\nOutput 2: {out_2}')
