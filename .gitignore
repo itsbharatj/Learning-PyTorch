@@ -1,5 +1,5 @@
-gpt.py 
+gpt.py
 learn_pytorch.py
 .DS_Store
 remove_folder_spaces.sh
-./Day_15_Feed_Forward_Network/MNIST/raw
+Day_15_Feed_Forward_Network/MNIST/raw
