@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 import numpy as np 
 import torch.nn.functional as F
 import matplotlib.pyplot as plt 
-
+import time 
 
 '''
 We need to make a CNN to classify the CIFAR-10 Dataset. Contains the images and the classes for 10 objects. 
@@ -31,11 +31,13 @@ We need to make a CNN to classify the CIFAR-10 Dataset. Contains the images and 
 - Make the inferences
 '''
 
+device = torch.device("mps")
 ## Define the Hyperparameters: 
-batch_size = 10 
-n_epochs = 3 
-lr = 0.001
+batch_size = 100
+n_epochs = 100
+lr = 0.01
 
+class_labels = ["airplane", "automobile", "bird", "cat", "deer", "dog", "frog", "horse", "ship","truck"]
 ## Transforms: 
 transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), torchvision.transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
 
@@ -63,7 +65,7 @@ class CNN_Model(nn.Module):
         out = self.pool1(F.relu(self.conv1(x)))
         out = self.pool1(F.relu(self.conv2(out)))
 
-        out = out.view(-1,16*5*5)
+        out = out.view(-1,16*5*5)  ##Need to understand this for now
 
         out = self.fc1(out)
         out = self.fc2(out)
@@ -71,7 +73,7 @@ class CNN_Model(nn.Module):
 
         return out
 
-model = CNN_Model()
+model = CNN_Model().to(device)
 criterion = nn.CrossEntropyLoss()
 optim = torch.optim.SGD(model.parameters(),lr=lr)
 data_size = train_data.__len__()
@@ -81,12 +83,15 @@ data_eg_train = next(data_eg_train)
 
 images, labels = data_eg_train
 
-print(f'Shape of data tensor {images.shape}, Labels: {labels.shape}')
+print(f'Shape of data tensor {images.shape}, Labels: {labels.shape}, Example Labels: {labels[:10]}')
 
 ## Training: 
-
+st = time.time()
 for epoch in range(n_epochs): 
     for ind,(images,labels) in enumerate(train_loader): 
+
+        images = images.to(device)
+        labels = labels.to(device)
         #This is a batch: 100 images together: What is the shape of these images? --> [100,3,32,32] 
         y_pred = model(images) # --> 
 
@@ -101,12 +106,51 @@ for epoch in range(n_epochs):
 
         ## Print the information of the training: 
 
-        if (ind%10)==0: 
+        if (ind%200)==0: 
             print(f'Epoch: {epoch}, Itteration: {ind}, Loss: {loss}')
+print(f'Time for training: {time.time()-st}')
 
+## Print the test samples: 
 
+with torch.no_grad(): 
+    # train_batch = iter(test_loader)
+    # train_batch = next(train_batch)
 
+    
 
+    # images, labels = train_batch
+    # images = images.to(device)
+    # labels = labels.to(device)
+
+    # model_prediction = model(images)
+
+    # ## We need to find the max value for the final predictions: 
+
+    # _,prediction_label = torch.max(model_prediction,1)
+
+    # ## Example batch printing: 
+    # for i in range(6): 
+    #     plt.subplot(2,3,i+1)
+    #     plt.imshow(images[i].T.cpu())
+    #     plt.title(f'Prediction:{class_labels[prediction_label[i]]}, Actual:{class_labels[labels[i]]}')
+    # plt.show()
+
+    ##Actual Accuracy of the model: 
+
+    n_samples_iter = 0 
+    n_correct = 0 
+    for (images,labels) in test_loader: 
+
+        images = images.to(device)
+        labels = labels.to(device)
+
+        y_pred = model(images)
         
+        ## Actual labels: 
+        _,model_pred = torch.max(y_pred,1)
 
+        n_correct += (model_pred==labels).sum().item()
+        n_samples_iter += labels.shape[0]
 
+    accuracy = (n_correct/n_samples_iter)*100
+    print(f'Total Accuracy for all the classes: {accuracy}')
