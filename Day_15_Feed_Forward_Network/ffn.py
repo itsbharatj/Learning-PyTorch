@@ -115,28 +115,34 @@ end = time.time() - start
 print(end)
 
 
-## Printing the test examples on the trained model: 
-'''
-We have the model, we need to make the predictions using the model: 
-'''
-n_itter_test = int(test_data.__len__()/batch_size)
+with torch.no_grad(): 
+
+    ## Printing the test examples on the trained model: 
+    '''
+    We have the model, we need to make the predictions using the model: 
+    '''
+
+    n_itter_test = int(test_data.__len__()/batch_size)
 
 
-data = iter(data_l_test)
-data = next(data)
-images,labels = data
-images2 = images.reshape(-1,784)
-y_pred = model(images2)
-print(y_pred.shape)
-_,predictions = torch.max(y_pred,1)
+    data = iter(data_l_test)
+    data = next(data)
+    images,labels = data
+    images2 = images.reshape(-1,784)
+    y_pred = model(images2)
+    print(y_pred.shape)
+    _,predictions = torch.max(y_pred,1)
+
+    n_correct = (predictions==y_pred).sum().item()
+    n_samples = labels.shape[0]
 
 
-for i in range(20): 
-    plt.subplot(5,4,i+1)
-    plt.imshow(images[i][0],cmap='grey')
-    plt.title(f'{labels[i].item()},{predictions[i]}')
-# plt.show()
-plt.savefig('./Day_15_Feed_Forward_Network/test_plots.png')
-loss = criterion(y_pred,labels)
+    for i in range(20): 
+        plt.subplot(5,4,i+1)
+        plt.imshow(images[i][0],cmap='grey')
+        plt.title(f'{labels[i].item()},{predictions[i]}')
+    # plt.show()
+    plt.savefig('./Day_15_Feed_Forward_Network/test_plots.png')
+    loss = criterion(y_pred,labels)
 
-print(f"Loss {loss}")
+    print(f"Loss {loss}")
