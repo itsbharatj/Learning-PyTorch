@@ -7,6 +7,7 @@ import numpy as np
 import torch.nn.functional as F
 import matplotlib.pyplot as plt 
 import time 
+from save_load_model import save_load
 
 '''
 We need to make a CNN to classify the CIFAR-10 Dataset. Contains the images and the classes for 10 objects. 
@@ -45,9 +46,14 @@ transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), t
 
 train_data = torchvision.datasets.CIFAR10(root="./data",train=True,download=True,transform=transform)
 test_data = torchvision.datasets.CIFAR10(root="./data",train=False,download=True,transform=transform)
+test_data_normal = torchvision.datasets.CIFAR10(root="./data",train=False,download=True,transform=torchvision.transforms.ToTensor())
+
 
 train_loader = DataLoader(train_data,batch_size=batch_size,shuffle=True)
-test_loader = DataLoader(test_data,batch_size=batch_size,shuffle=True)
+test_loader = DataLoader(test_data,batch_size=batch_size,shuffle=False)
+test_loader_normal = DataLoader(test_data_normal,batch_size=batch_size,shuffle=False)
+
+model_save = save_load 
 
 ##Define the CNN Model: 
 
@@ -73,6 +79,7 @@ class CNN_Model(nn.Module):
 
         return out
 
+
 model = CNN_Model().to(device)
 criterion = nn.CrossEntropyLoss()
 optim = torch.optim.SGD(model.parameters(),lr=lr)
@@ -84,6 +91,15 @@ data_eg_train = next(data_eg_train)
 images, labels = data_eg_train
 
 print(f'Shape of data tensor {images.shape}, Labels: {labels.shape}, Example Labels: {labels[:10]}')
+
+
+# # # Load the saved state
+# model, optim, epoch, loss = save_load.load_model(model, optim, 'cifar10_cnn.pth', device)
+
+# # Model is now ready for inference
+# model.eval()  # Set to evaluation mode
+
+loss_epoch = {}
 
 ## Training: 
 st = time.time()
@@ -100,7 +116,7 @@ for epoch in range(n_epochs):
 
         ## Backpropogation: 
 
-        optim.zero_grad()
+        optim.zero_grad()   
         loss.backward()
         optim.step()
 
@@ -108,32 +124,49 @@ for epoch in range(n_epochs):
 
         if (ind%200)==0: 
             print(f'Epoch: {epoch}, Itteration: {ind}, Loss: {loss}')
-print(f'Time for training: {time.time()-st}')
+    
+    loss_epoch[epoch] = loss.item()
+    
+    model_save.save_model(model, optim, epoch, loss, 'cifar10_cnn.pth')
+
+# print(f'Time for training: {time.time()-st}')
+
+print(loss_epoch)
+plt.figure(1)
+plt.plot(loss_epoch.keys(),loss_epoch.values())
+plt.show()
+
 
 ## Print the test samples: 
 
 with torch.no_grad(): 
-    # train_batch = iter(test_loader)
-    # train_batch = next(train_batch)
+    train_batch_normal = iter(test_loader_normal)
+    train_batch_normal = next(train_batch_normal)
+    images_normal,_ = train_batch_normal
+
+    
+    train_batch = iter(test_loader)
+    train_batch = next(train_batch)
 
     
 
-    # images, labels = train_batch
-    # images = images.to(device)
-    # labels = labels.to(device)
+    images, labels = train_batch
+    images = images.to(device)
+    labels = labels.to(device)
 
-    # model_prediction = model(images)
+    model_prediction = model(images)
 
-    # ## We need to find the max value for the final predictions: 
+    ## We need to find the max value for the final predictions: 
 
-    # _,prediction_label = torch.max(model_prediction,1)
+    _,prediction_label = torch.max(model_prediction,1)
 
-    # ## Example batch printing: 
-    # for i in range(6): 
-    #     plt.subplot(2,3,i+1)
-    #     plt.imshow(images[i].T.cpu())
-    #     plt.title(f'Prediction:{class_labels[prediction_label[i]]}, Actual:{class_labels[labels[i]]}')
-    # plt.show()
+    plt.figure(2)
+    ## Example batch printing: 
+    for i in range(6): 
+        plt.subplot(2,3,i+1)
+        plt.imshow(images_normal[i].T.cpu())
+        plt.title(f'Prediction:{class_labels[prediction_label[i]]}, Actual:{class_labels[labels[i]]}')
+    plt.show()
 
     ##Actual Accuracy of the model: 
 
@@ -154,3 +187,5 @@ with torch.no_grad():
 
     accuracy = (n_correct/n_samples_iter)*100
     print(f'Total Accuracy for all the classes: {accuracy}')
+
+
