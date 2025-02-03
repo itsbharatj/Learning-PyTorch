@@ -58,4 +58,4 @@ for i, folder in enumerate(all_folders):
 if not os.path.exists(f'{data_dir}/val'): 
     os.mkdir(f'{data_dir}/val')
     for i in folders: 
-        shutil.move(src=f'{data_dir}/{i}',dst=f'{data_dir}/{i}/val')
+        shutil.move(src=f'{data_dir}/{i}',dst=f'{data_dir}/val')
