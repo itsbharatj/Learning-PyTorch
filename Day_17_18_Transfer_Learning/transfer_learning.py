@@ -173,13 +173,14 @@ def train(model,criterion,scheduler,optimizer,n_epochs=10):
 
                     running_loss += loss.item() * inputs.size(0)
                     running_corrects += torch.sum(probs == labels)
-                    
-                    if phase == "val" and epoch_acc > best_acc: 
-                        best_acc = epoch_acc
-                        best_model_wts = copy.deepcopy(model.state_dict())
+            
 
             epoch_loss = running_loss / dataset_size[phase]
             epoch_acc = running_corrects.float() / dataset_size[phase]
+
+            if phase == "val" and epoch_acc > best_acc: 
+                best_acc = epoch_acc
+                best_model_wts = copy.deepcopy(model.state_dict())
 
             print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
