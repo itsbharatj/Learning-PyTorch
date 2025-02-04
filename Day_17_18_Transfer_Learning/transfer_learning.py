@@ -202,7 +202,14 @@ model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
 ##Get the features in last layers of the last layer
 num_fts = model.fc.in_features
 ## Adding a new layer, with 2 features for own dataset
-model.fc = nn.Linear(num_fts,2)
+
+## This can be used to freeze the layers and train much faster!! 
+for param in model.parameters():
+    param.requires_grad = False
+
+model.fc = nn.Linear(num_fts, 2)  # Only this layer will train
+
+
 model.to(device)
 
 criterion = nn.CrossEntropyLoss()
@@ -211,8 +218,9 @@ optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 ## Every 7th epoch (step_size), lr is multipled by 0.01 (gamma)
 step_b_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,step_size=7,gamma=0.01)
 
-# model = train(model=model,criterion=criterion,scheduler=step_b_scheduler,optimizer=optimizer,n_epochs=1)
+model = train(model=model,criterion=criterion,scheduler=step_b_scheduler,optimizer=optimizer,n_epochs=1)
 
+torch.save(model.state_dict(),"models/cats_dogs.pth")
 ## I need to see the images and labels 
 
 
