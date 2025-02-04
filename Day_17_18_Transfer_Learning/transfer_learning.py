@@ -173,16 +173,17 @@ def train(model,criterion,scheduler,optimizer,n_epochs=10):
 
                     running_loss += loss.item() * inputs.size(0)
                     running_corrects += torch.sum(probs == labels)
-
-                    epoch_loss = running_loss / dataset_size[phase]
-                    epoch_acc = running_corrects.float() / dataset_size[phase]
-
-                    print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
-
+                    
                     if phase == "val" and epoch_acc > best_acc: 
                         best_acc = epoch_acc
                         best_model_wts = copy.deepcopy(model.state_dict())
-                    print()
+
+            epoch_loss = running_loss / dataset_size[phase]
+            epoch_acc = running_corrects.float() / dataset_size[phase]
+
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+
+
             
             if phase == "train": 
                 scheduler.step()
@@ -218,34 +219,34 @@ optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 ## Every 7th epoch (step_size), lr is multipled by 0.01 (gamma)
 step_b_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,step_size=7,gamma=0.01)
 
-model = train(model=model,criterion=criterion,scheduler=step_b_scheduler,optimizer=optimizer,n_epochs=1)
+model = train(model=model,criterion=criterion,scheduler=step_b_scheduler,optimizer=optimizer,n_epochs=10)
 
 torch.save(model.state_dict(),"models/cats_dogs.pth")
 ## I need to see the images and labels 
 
 
-# Get one batch of training data
-data_train_iter = iter(Dataloaders["train"])
-images, labels = next(data_train_iter)
+# # Get one batch of training data
+# data_train_iter = iter(Dataloaders["train"])
+# images, labels = next(data_train_iter)
 
-print(f'''
-        Shape of Images: {images.shape}\nImages: {images}\n
-        Shape of Labels: {labels.shape}\nLabels: {labels}      
-      ''')
+# print(f'''
+#         Shape of Images: {images.shape}\nImages: {images}\n
+#         Shape of Labels: {labels.shape}\nLabels: {labels}      
+#       ''')
 
-label_names = ["cats", "dogs"]
-print(' '.join(f'{label_names[labels[j]]}' for j in range(len(labels))))
+# label_names = ["cats", "dogs"]
+# print(' '.join(f'{label_names[labels[j]]}' for j in range(len(labels))))
 
-# Function to show an image
-def imshow(img):
-    img = img / 2 + 0.5  # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
+# # Function to show an image
+# def imshow(img):
+#     img = img / 2 + 0.5  # unnormalize
+#     npimg = img.numpy()
+#     plt.imshow(np.transpose(npimg, (1, 2, 0)))
+#     plt.show()
 
-# Make a grid from batch
-out = torchvision.utils.make_grid(images)
+# # Make a grid from batch
+# out = torchvision.utils.make_grid(images)
 
-imshow(out)
+# imshow(out)
     
 
