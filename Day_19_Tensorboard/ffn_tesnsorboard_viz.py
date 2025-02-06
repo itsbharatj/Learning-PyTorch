@@ -23,7 +23,7 @@ import sys
 from torch.utils.tensorboard import SummaryWriter
 
 
-writer = SummaryWriter("runs/MNIST_2")
+writer = SummaryWriter("runs/MNIST_3")
 
 '''
 We need to make a MNIST classifier Neural Netwrok from PyTorch 
@@ -147,12 +147,14 @@ for epoch in range(n_epochs):
         _,preds = torch.max(y_pred,1)
         running_corrects = (preds == labels).sum().item()
 
-        if(ind%100 ==0): 
-            print(f'Epoch: {epoch}, Itteration: {ind}, Loss: {loss}')
-            writer.add_scalar("Average Loss over 100 itterations",running_loss/100, (epoch*batch_size + ind)) 
+        if(ind%50 ==0): 
+            print(f'Epoch: {epoch}, Itteration: {ind}, Loss: {loss}\nav. loss: {running_loss/50},av. accuracy: {running_corrects/50}')
+            writer.add_scalar("Average Loss over 100 itterations",running_loss/50, (epoch*batch_size + ind)) 
             ## This gives an average number of correct predictions over 100 itterations 
-            writer.add_scalar("Average Corrects over 100 itterations",(running_corrects/100), (epoch*batch_size + ind))
+            writer.add_scalar("Average Corrects over 100 itterations",(running_corrects/50), (epoch*batch_size + ind))
             writer.close()
+            running_loss = 0.0 
+            running_corrects = 0 
 
 sys.exit()
 end = time.time() - start  
